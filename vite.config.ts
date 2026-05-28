@@ -10,4 +10,5 @@ export default defineConfig({
     babel({ presets: [reactCompilerPreset()] }),
     tailwindcss(),
   ],
+  base: '/stock-crawler-tw/', // 運行於github用
 })
