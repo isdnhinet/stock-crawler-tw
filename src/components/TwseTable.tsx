@@ -1,10 +1,12 @@
 import { useTwseQuery } from "../hooks/useTwseQuery";
 import { BaseUrl } from "../constants/baseUrl";
 
-export function TwseTable({ path, params }: {
+interface Props {
     path: typeof BaseUrl[keyof typeof BaseUrl];
     params: Record<string, string>;
-}) {
+}
+
+export function TwseTable({ path, params }: Props) {
     const { result, status } = useTwseQuery(path, params);
 
     if(status.loading) return <div>Loading...</div>

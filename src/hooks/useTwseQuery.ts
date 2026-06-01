@@ -6,22 +6,22 @@ interface TwseResponse {
     data: string[][];
 }
 
+function buildUrl(path: string, params: Record<string, string>): string {
+    if(path === BaseUrl.STOCK_DAY) {
+        return `${path}?${new URLSearchParams({response: "json", ...params}).toString()}`;
+    }else if(path === BaseUrl.STOCK_DAY_ALL) {
+        return `${path}/${params.date}.json`;
+    }
+    return path;
+}
+
 export function useTwseQuery(path: string, params: Record<string, string>) {
     const [data, setData] = useState<string[][]>([]);
     const [fields, setFields] = useState<string[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
-    const url: string = useMemo(() => {
-        if(path === BaseUrl.STOCK_DAY) {
-            const queryString = new URLSearchParams({response: "json", ...params}).toString();
-            return `${path}?${queryString}`;
-        }else if(path === BaseUrl.STOCK_DAY_ALL) {
-            return `${path}/${params.date}.json`;
-        }
-        return path;
-    }, [path, params]);
-    console.log(url);
+    const url: string = useMemo(() => buildUrl(path, params), [path, params]);
 
     useEffect(() =>{
         const controller = new AbortController();
@@ -31,6 +31,7 @@ export function useTwseQuery(path: string, params: Record<string, string>) {
             setLoading(true); 
             try {
                 const res = await fetch(url, { signal });
+                if(!res.ok) throw new Error(`HTTP error: ${res.status}`);
                 const json: TwseResponse = await res.json();
                 setData(json.data ?? []);
                 setFields(json.fields ?? []);
