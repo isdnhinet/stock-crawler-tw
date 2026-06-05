@@ -6,3 +6,11 @@ export const BaseUrl = {
   // 接收date
   STOCK_DAY_ALL: "https://raw.githubusercontent.com/isdnhinet/twse-data/main/data",
 } as const;
+
+export function getStockDayUrl(stockNo: string, date: string) {
+    return `${BaseUrl.STOCK_DAY}?response=json&stockNo=${stockNo}&date=${date}`;
+}
+
+export function getStockDayAllUrl(date: string) {
+    return `${BaseUrl.STOCK_DAY_ALL}/${date}.json`;
+}
