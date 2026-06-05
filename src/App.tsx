@@ -1,12 +1,9 @@
-import {  useNavigate,   } from "react-router-dom";
 import TopBar from "./components/TopBar";
 import { TwseAllDayTable } from "./components/TwseDayAllTable";
 import { TwseDayTable } from "./components/TwseDayTable";
-import { useEffect, useState } from "react";
 
 function App() {
-  const navigate = useNavigate();
-  const [test, setTest] = useState(false);
+  const test = false;
   
   return (
     <div className="min-h-screen text-white bg-gray-900">
