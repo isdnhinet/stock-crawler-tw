@@ -2,26 +2,23 @@ import { toObjectArray } from "../utils/toObjectArray";
 import { useMemo, useState } from "react";
 import { useStockData } from "../hooks/useStockData";
 
-type Props = {
-    params: Record<string, string>;
-};
-
 function parseValue(v: string) {
     if (!v || v === '--') return 0;
     return Number(v.replace(/,/g,""));
 }
 
-export function TwseAllDayTable({ params }: Props) {
-    const { result, status } = useStockData({type: "all", date: params.date});
+export default function TwseDailyTable({ date }: { date: string }) {
+    const { result, status } = useStockData({type: "daily", date: date});
+
     const objData = toObjectArray(result.fields, result.data);
     const [sortField, setSortField] = useState<string>("證券代號");
+    
     const sortedData = useMemo(() => {
         if (!objData.length) return [];
         const data = [...objData];
         return data.sort((a, b) => {
             const aVal = parseValue(a[sortField]);
             const bVal = parseValue(b[sortField]);
-
             return bVal - aVal;
         });
     }, [objData, sortField]);
@@ -30,6 +27,7 @@ export function TwseAllDayTable({ params }: Props) {
     if(status.error) return <div>Error: {status.error}</div>
     return (
         <div>
+            <p>{date}</p>
             <table className=" w-full border-collapse ">
                 <thead>
                     <tr>
@@ -46,7 +44,7 @@ export function TwseAllDayTable({ params }: Props) {
                     </tr>
                 </thead>
                 <tbody>
-                {sortedData.map((row, rowIdx) => (
+                    {sortedData.map((row, rowIdx) => (
                         <tr key={rowIdx}>
                             {result.fields.map((field) => (
                                 <td key={field} className="border border-amber-50 px-4 py-2">{row[field]}</td>

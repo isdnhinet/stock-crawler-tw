@@ -8,23 +8,22 @@ type StockResponse = {
 }
 
 type UseStockOptions = 
-    | {type: "all"; date: string}
-    | {type: "single"; stockNo: string; date: string};
+    | {type: "daily"; date: string }
+    | {type: "detail"; date: string; stockNo: string };
 
 export function useStockData(options: UseStockOptions) {
     const url = useMemo(() => {
-        if (options.type === "all") {
+        if (options.type === "daily") {
             return getStockDayAllUrl(options.date);
+        } else if (options.type === "detail") {
+            return getStockDayUrl(options.date, options.stockNo);
         }
-        return getStockDayUrl(options.stockNo, options.date);
+        return "";
     }, [options]);
 
-    const { json, status } = useFetchJson<StockResponse>(url);
+    const { json, loading, error } = useFetchJson<StockResponse>(url);
     const data = json?.data ?? [];
     const fields = json?.fields ?? [];
 
-    return { 
-        result: { data, fields }, 
-        status,
-    }; 
+    return { result: { data, fields }, status: { loading, error } }; 
 }

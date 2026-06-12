@@ -1,26 +1,97 @@
+import { Suspense, useMemo, useState, lazy, useEffect } from "react";
 import TopBar from "./components/TopBar";
-import { TwseAllDayTable } from "./components/TwseDayAllTable";
-import { TwseDayTable } from "./components/TwseDayTable";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
+import dayTools from "./utils/dayTools";
+import { useStockDataRange } from "./hooks/useStockDataRange";
+
+/* Lazy load components */
+const createLazyComponent = ( componentPath: string, componentName: string ) => {
+  return lazy(() => 
+    import(componentPath).catch(err => {
+      console.error(`Failed to load ${componentName}`, err);
+      return {
+        default: () => (
+          <div className="bg-linear-to-br from-red-900/60 via-red-800/40 to-red-900/60 rounded-lg border border-red-500/40 p-6 text-center">
+            <div className="text-red-400 mb-2">
+              <svg 
+                xmlns="http://www.w3.org/2000/svg" 
+                className="h-8 w-8 mx-auto" 
+                fill="none" 
+                viewBox="0 0 24 24" 
+                stroke="currentColor"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+              </svg>
+            </div>
+            <p className="text-red-300 font-semibold mb-1">載入失敗</p>
+            <p className="text-red-400/80 text-sm">無法載入{componentName}，請重新整理頁面</p>
+          </div>
+        ) 
+      };
+    })
+  );
+};
+
+const TwseDailyTable = createLazyComponent( "./components/TwseDailyTable", "TwseDailyTable" );
+const TwseDetailTable = createLazyComponent("./components/TwseDetailTable", "TwseDetailTable");
+
+const SupenseFallback = () => (
+  <div className="bg-linear-to-br from-slate-950 via-slate-900 to-slate-950 min-h-screen text-white flex items-center justify-center">
+    <div className="animate-spin rounded-full h-12 w-12 border-4 border-slate-700 border-t-amber-50"></div>
+  </div>
+);
 
 function App() {
-  const test = false;
+  const [searchValue, setSearchValue] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+
+  const navigate = useNavigate();
+  const location = useLocation();
+  const params = useParams();
+
+  const yesterday = dayTools().subtract(1).format("YYYYMMDD");
+
+  const isOnStockInfoPage = location.pathname.match(/^\/stock\/(\d+)$/) !== null;
+  const currentStockId = useMemo(() => {
+    if (params.id) return params.id;
+    if (location.pathname.startsWith('/stock/')) {
+      const match = location.pathname.match(/^\/stock\/(\d+)(?:\/(.+))?$/); 
+      if (match) return match[1];
+    }
+    return null;
+  }, [params.id, location.pathname]);
+
+  const handleSearch = (val: string) => {
+    setSearchValue(val);
+  };
+
+  useEffect(() => {
+    if (searchValue.length === 4) {
+      navigate(`/stock/${searchValue}`);
+    }
+  }, [searchValue, navigate]);
+
+  console.log(useStockDataRange(5));
+
+  console.log(useStockDataRange(5, "20250505"));
   
   return (
-    <div className="min-h-screen text-white bg-gray-900">
-      <TopBar />
+    <div className="min-h-screen bg-linear-to-br from-slate-950 via-slate-900 to-slate-950 text-white">
+      <TopBar searchValue={searchValue} onSearch={handleSearch} disabled={isLoading} />
       { /* Main Content */ }
       <div 
         className="pb-8" 
         style={{paddingTop: 'calc(var(--topbar-content-offset, 96px) + clamp(3.5rem, 10vw, 6rem))'}}
       >
-        { 
-          test && (
-            <div>
-              <TwseDayTable params={{date: "20260527", stockNo: "2330"}} />
-              <TwseAllDayTable params={{ date: "20260527"}} />
-            </div>
-          )
+        {
+          isOnStockInfoPage && currentStockId && 
+          <Suspense fallback={<SupenseFallback/>}>
+            <TwseDetailTable stockNo={currentStockId} date={yesterday} />
+          </Suspense>
         }
+        <Suspense fallback={<SupenseFallback/>}>
+          <TwseDailyTable date={yesterday} />
+        </Suspense>
       </div>
     </div>
   );

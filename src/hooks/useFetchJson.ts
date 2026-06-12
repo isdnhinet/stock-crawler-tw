@@ -23,5 +23,5 @@ export function useFetchJson<T>(url: string) {
         })();
     }, [url]);
 
-    return {json, status: {loading, error}};
+    return { json, loading, error };
 }

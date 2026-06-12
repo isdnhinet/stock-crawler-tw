@@ -7,7 +7,7 @@ export const BaseUrl = {
   STOCK_DAY_ALL: "https://raw.githubusercontent.com/isdnhinet/twse-data/main/data",
 } as const;
 
-export function getStockDayUrl(stockNo: string, date: string) {
+export function getStockDayUrl(date: string, stockNo: string) {
     return `${BaseUrl.STOCK_DAY}?response=json&stockNo=${stockNo}&date=${date}`;
 }
 
