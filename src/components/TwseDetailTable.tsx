@@ -5,7 +5,6 @@ export default function TwseDayTable({ date, stockNo }: { date: string, stockNo:
     const { result, status } = useStockData({type: "detail", date: date, stockNo: stockNo});
     const objData = toObjectArray(result.fields, result.data);
 
-    if(status.loading) return <div>Loading...</div>
     if(status.error) return <div>Error: {status.error}</div>
     return (
         <div>

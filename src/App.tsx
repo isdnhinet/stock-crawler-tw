@@ -2,7 +2,6 @@ import { Suspense, useMemo, useState, lazy, useEffect } from "react";
 import TopBar from "./components/TopBar";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import dayTools from "./utils/dayTools";
-import { useStockDataRange } from "./hooks/useStockDataRange";
 
 /* Lazy load components */
 const createLazyComponent = ( componentPath: string, componentName: string ) => {
@@ -49,7 +48,7 @@ function App() {
   const location = useLocation();
   const params = useParams();
 
-  const yesterday = dayTools().subtract(1).format("YYYYMMDD");
+  const yesterday = dayTools().subtract(3).format("YYYYMMDD");
 
   const isOnStockInfoPage = location.pathname.match(/^\/stock\/(\d+)$/) !== null;
   const currentStockId = useMemo(() => {
@@ -70,10 +69,6 @@ function App() {
       navigate(`/stock/${searchValue}`);
     }
   }, [searchValue, navigate]);
-
-  console.log(useStockDataRange(5));
-
-  console.log(useStockDataRange(5, "20250505"));
   
   return (
     <div className="min-h-screen bg-linear-to-br from-slate-950 via-slate-900 to-slate-950 text-white">

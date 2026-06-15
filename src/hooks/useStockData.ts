@@ -1,6 +1,6 @@
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { getStockDayAllUrl, getStockDayUrl } from "../constants/baseUrl";
-import { useFetchJson } from "./useFetchJson";
+import { fetchTwseJson } from "../utils/fetchTwseJson";
 
 type StockResponse = {
     data: string[][];
@@ -21,9 +21,22 @@ export function useStockData(options: UseStockOptions) {
         return "";
     }, [options]);
 
-    const { json, loading, error } = useFetchJson<StockResponse>(url);
-    const data = json?.data ?? [];
-    const fields = json?.fields ?? [];
+    const [res, setRes] = useState<StockResponse>();
+    const [error, setError] = useState<string>("");
 
-    return { result: { data, fields }, status: { loading, error } }; 
+    useEffect(() =>{
+        const controller = new AbortController();
+
+        fetchTwseJson<StockResponse>(url, { signal: controller.signal })
+            .then(setRes)
+            .catch((err) => setError(err.message));
+
+            return () => controller.abort();
+    }, [url]);
+
+    const data = res?.data ?? [];
+    const fields = res?.fields ?? [];
+
+
+    return { result: { data, fields }, status: { error } }; 
 }

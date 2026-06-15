@@ -23,7 +23,6 @@ export default function TwseDailyTable({ date }: { date: string }) {
         });
     }, [objData, sortField]);
 
-    if(status.loading) return <div>Loading...</div>
     if(status.error) return <div>Error: {status.error}</div>
     return (
         <div>
