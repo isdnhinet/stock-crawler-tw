@@ -42,7 +42,7 @@ const SupenseFallback = () => (
 
 function App() {
   const [searchValue, setSearchValue] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading] = useState(false);
 
   const navigate = useNavigate();
   const location = useLocation();
