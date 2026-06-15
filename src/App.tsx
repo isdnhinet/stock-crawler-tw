@@ -31,8 +31,9 @@ const createLazyComponent = ( componentPath: string, componentName: string ) => 
   );
 };
 
-const TwseDailyTable = createLazyComponent( "./components/TwseDailyTable", "TwseDailyTable" );
-const TwseDetailTable = createLazyComponent("./components/TwseDetailTable", "TwseDetailTable");
+// File Extension for github.io
+const TwseDailyTable = createLazyComponent( "./components/TwseDailyTable.tsx", "TwseDailyTable" );
+const TwseDetailTable = createLazyComponent("./components/TwseDetailTable.tsx", "TwseDetailTable");
 
 const SupenseFallback = () => (
   <div className="bg-linear-to-br from-slate-950 via-slate-900 to-slate-950 min-h-screen text-white flex items-center justify-center">
