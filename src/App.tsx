@@ -1,12 +1,15 @@
-import { Suspense, useMemo, useState, lazy, useEffect } from "react";
+import { Suspense, useMemo, useState, lazy, useEffect, type ComponentType } from "react";
 import TopBar from "./components/TopBar";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import dayTools from "./utils/dayTools";
 
 /* Lazy load components */
-const createLazyComponent = ( componentPath: string, componentName: string ) => {
+const createLazyComponent = <P extends object>( 
+  importFn: () => Promise<{ default: ComponentType<P> }>,
+  componentName: string 
+) => {
   return lazy(() => 
-    import(componentPath).catch(err => {
+    importFn().catch((err) => {
       console.error(`Failed to load ${componentName}`, err);
       return {
         default: () => (
@@ -25,15 +28,14 @@ const createLazyComponent = ( componentPath: string, componentName: string ) => 
             <p className="text-red-300 font-semibold mb-1">載入失敗</p>
             <p className="text-red-400/80 text-sm">無法載入{componentName}，請重新整理頁面</p>
           </div>
-        ) 
+        )
       };
     })
   );
 };
 
-// File Extension for github.io
-const TwseDailyTable = createLazyComponent( "./components/TwseDailyTable.tsx", "TwseDailyTable" );
-const TwseDetailTable = createLazyComponent("./components/TwseDetailTable.tsx", "TwseDetailTable");
+const TwseDailyTable = createLazyComponent(() => import("./components/TwseDailyTable"), "TwseDailyTable" );
+const TwseDetailTable = createLazyComponent(() => import("./components/TwseDetailTable"), "TwseDetailTable");
 
 const SupenseFallback = () => (
   <div className="bg-linear-to-br from-slate-950 via-slate-900 to-slate-950 min-h-screen text-white flex items-center justify-center">
