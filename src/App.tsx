@@ -58,13 +58,13 @@ function App() {
   const [searchValue, setSearchValue] = useState('');
   const [isLoading] = useState(false);
 
-  const navigate = useNavigate();
-  const location = useLocation();
-  const params = useParams();
-
   const yesterday = dayTools().subtract(1).format("YYYYMMDD");
   const beforeyesterday = dayTools().subtract(4).format("YYYYMMDD");
 
+
+  const navigate = useNavigate();
+  const location = useLocation();
+  const params = useParams();
   const isOnStockInfoPage = location.pathname.match(/^\/stock\/(\d+)$/) !== null;
   const currentStockId = useMemo(() => {
     if (params.id) return params.id;

@@ -49,7 +49,7 @@ export function useStockData( params: StockRequestParams ) {
                         status: "error", 
                         error: new Error("All requests failed"),
                     });
-                    return ;
+                    return;
                 }
 
                 setState({
