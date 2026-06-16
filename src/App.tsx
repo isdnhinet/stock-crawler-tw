@@ -38,12 +38,13 @@ const TwseDailyTable = createLazyComponent(() => import("./components/TwseDailyT
 const TwseDetailTable = createLazyComponent(() => import("./components/TwseDetailTable"), "TwseDetailTable");
 
 
-
+/*
 const MARKET_HISTORY_RANGE_OPTIONS = [
   { days: 1, label: '1天', date: []},
   { days: 3, label: '3天', date: []},
   { days: 5, label: '5天', date: []},
 ] as const;
+ */
 
 const SupenseFallback = () => (
   <div className="bg-linear-to-br from-slate-950 via-slate-900 to-slate-950 min-h-screen text-white flex items-center justify-center">
