@@ -3,7 +3,7 @@ import TopBar from "./components/TopBar";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import dayTools from "./utils/dayTools";
 
-/* Lazy load components */
+// lazy load components 
 const createLazyComponent = <P extends object>( 
   importFn: () => Promise<{ default: ComponentType<P> }>,
   componentName: string 
@@ -37,11 +37,21 @@ const createLazyComponent = <P extends object>(
 const TwseDailyTable = createLazyComponent(() => import("./components/TwseDailyTable"), "TwseDailyTable" );
 const TwseDetailTable = createLazyComponent(() => import("./components/TwseDetailTable"), "TwseDetailTable");
 
+
+
+const MARKET_HISTORY_RANGE_OPTIONS = [
+  { days: 1, label: '1天', date: []},
+  { days: 3, label: '3天', date: []},
+  { days: 5, label: '5天', date: []},
+] as const;
+
 const SupenseFallback = () => (
   <div className="bg-linear-to-br from-slate-950 via-slate-900 to-slate-950 min-h-screen text-white flex items-center justify-center">
     <div className="animate-spin rounded-full h-12 w-12 border-4 border-slate-700 border-t-amber-50"></div>
   </div>
 );
+
+
 
 function App() {
   const [searchValue, setSearchValue] = useState('');
@@ -51,7 +61,8 @@ function App() {
   const location = useLocation();
   const params = useParams();
 
-  const yesterday = dayTools().subtract(3).format("YYYYMMDD");
+  const yesterday = dayTools().subtract(1).format("YYYYMMDD");
+  const beforeyesterday = dayTools().subtract(4).format("YYYYMMDD");
 
   const isOnStockInfoPage = location.pathname.match(/^\/stock\/(\d+)$/) !== null;
   const currentStockId = useMemo(() => {
@@ -84,11 +95,11 @@ function App() {
         {
           isOnStockInfoPage && currentStockId && 
           <Suspense fallback={<SupenseFallback/>}>
-            <TwseDetailTable stockNo={currentStockId} date={yesterday} />
+            <TwseDetailTable stockNo={currentStockId} date={[yesterday]} />
           </Suspense>
         }
         <Suspense fallback={<SupenseFallback/>}>
-          <TwseDailyTable date={yesterday} />
+          <TwseDailyTable date={[yesterday, beforeyesterday]} />
         </Suspense>
       </div>
     </div>
