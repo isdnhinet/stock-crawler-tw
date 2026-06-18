@@ -2,7 +2,15 @@ export default function dayTools(input?: string | number | Date, format: string 
     let date: Date;
 
     if (typeof input === "string") {
-        if (format === "YYYYMMDD" && /^\d{8}$/.test(input)) {
+        const trimmed = input.trim();
+        const twnDate = trimmed.match(/^(\d{2,3})[-/](\d{2})[-/](\d{2})$/);
+
+        if (twnDate) {
+            const twnY = parseInt(twnDate[1], 10);
+            const month = parseInt(twnDate[2], 10) -1;
+            const day = parseInt(twnDate[3], 10);
+            date = new Date(twnY + 1911, month, day);
+        } else if (format === "YYYYMMDD" && /^\d{8}$/.test(input)) {
             const year = parseInt(input.slice(0, 4));
             const month = parseInt(input.slice(4, 6)) - 1;
             const day = parseInt(input.slice(6, 8));
@@ -19,7 +27,7 @@ export default function dayTools(input?: string | number | Date, format: string 
     }
 
     return {
-        format: (format: string): string => {
+        format: (f: string): string => {
             const year = date.getFullYear().toString();
             const month = (date.getMonth() + 1).toString().padStart(2, "0");
             const day = date.getDate().toString().padStart(2, "0");
@@ -27,7 +35,7 @@ export default function dayTools(input?: string | number | Date, format: string 
             const m = date.getMinutes().toString().padStart(2, "0");
             const s = date.getSeconds().toString().padStart(2, "0");
             const twnYear = (date.getFullYear() - 1911).toString(); 
-            return format
+            return f
                 .replace("YYYY", year)
                 .replace("YYY", twnYear)
                 .replace("MM", month)
