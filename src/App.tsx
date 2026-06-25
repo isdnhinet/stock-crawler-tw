@@ -56,7 +56,7 @@ const SupenseFallback = () => (
 
 function App() {
   const [isLoading, setIsLoading] = useState(false);
-  const [marketHistoryRangeDays, setMarketHistoryRangeDays] = useState(() => {
+  const [marketHistoryRangeDays] = useState(() => {
     const saved = Number(localStorage.getItem(MARKET_HISTORY_RANGE_STORAGE_KEY));
 
     return MARKET_HISTORY_RANGE_OPTIONS.some(option => option.days === saved)
