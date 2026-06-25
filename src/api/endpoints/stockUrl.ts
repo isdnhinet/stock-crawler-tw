@@ -1,8 +1,8 @@
 export const stockUrl = {
-  // 接收date, stockNo
-  // 欄位stat, date, title, fields, data
+  // `${stockUrl.STOCK_DAY}?response=json&stockNo=${stockNo}&date=${date}`
   STOCK_DAY: "https://www.twse.com.tw/exchangeReport/STOCK_DAY",
 
-  // 接收date
+  // `${stockUrl.STOCK_DAY_ALL}/${date}.json`
   STOCK_DAY_ALL: "https://raw.githubusercontent.com/isdnhinet/twse-data/main/data",
+
 } as const;

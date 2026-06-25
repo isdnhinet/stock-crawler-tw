@@ -1,7 +1,17 @@
-import { Suspense, useMemo, useState, lazy, type ComponentType } from "react";
+import { Suspense, useMemo, useState, lazy, type ComponentType, useEffect } from "react";
 import TopBar from "./components/TopBar";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { getPastDays } from "./utils/getPastDays";
+
+const MARKET_HISTORY_RANGE_STORAGE_KEY = "twse_market_history_range_days";
+const MARKET_HISTORY_RANGE_OPTIONS = [
+  { days: 1, label: '1天' },
+  { days: 3, label: '3天' },
+  { days: 7, label: '7天' },
+  { days: 14, label: '14天' },
+  { days: 30, label: '30天' },
+];
+const DEFAULT_MARKET_HISTORY_RANGE_DAYS = 7;
 
 // lazy load components 
 const createLazyComponent = <P extends object>( 
@@ -43,33 +53,46 @@ const SupenseFallback = () => (
   </div>
 );
 
-function App() {
-  const [isLoading] = useState(false);
 
-  const day = getPastDays(2);
+function App() {
+  const [isLoading, setIsLoading] = useState(false);
+  const [marketHistoryRangeDays, setMarketHistoryRangeDays] = useState(() => {
+    const saved = Number(localStorage.getItem(MARKET_HISTORY_RANGE_STORAGE_KEY));
+
+    return MARKET_HISTORY_RANGE_OPTIONS.some(option => option.days === saved)
+      ? saved : DEFAULT_MARKET_HISTORY_RANGE_DAYS;
+  });
+
+  const days = getPastDays(marketHistoryRangeDays);
+
 
   const navigate = useNavigate();
   const location = useLocation();
   const params = useParams();
 
-  const isOnStockInfoPage = location.pathname.match(/^\/stock\/(\d+)$/) !== null;
+  const isOnStockInfoPage = location.pathname.match(/^\/stock\/([0-9A-Za-z]+)$/) !== null;
   const currentStockId = useMemo(() => {
     if (params.id) return params.id;
     if (location.pathname.startsWith('/stock/')) {
-      const match = location.pathname.match(/^\/stock\/(\d+)(?:\/(.+))?$/); 
+      const match = location.pathname.match(/^\/stock\/([0-9A-Za-z]+)(?:\/(.+))?$/); 
+
       if (match) return match[1];
     }
     return '';
   }, [params.id, location.pathname]);
 
   const handleSearch = (val: string) => {
-    //setSearchValue(val);
-    if (val.length === 4) {
+    if (val.length !== 0) {
       navigate(`/stock/${val}`);
     } else if (val === '') {
       navigate('/');
     }
   };
+
+  useEffect(() => {
+    console.log("route change:", location.pathname);
+
+  }, [location.pathname])
 
   return (
     <div className="min-h-screen bg-linear-to-br from-slate-950 via-slate-900 to-slate-950 text-white">
@@ -83,14 +106,14 @@ function App() {
         {
           isOnStockInfoPage && currentStockId && 
           <Suspense fallback={<SupenseFallback/>}>
-            <TwseDetailTable stockNo={currentStockId} date={["20260601"]} />
+            <TwseDetailTable stockNo={currentStockId} date={["20260601"]} setIsLoading={ setIsLoading }/>
           </Suspense>
         }
 
         {
           location.pathname === '/' &&
           <Suspense fallback={<SupenseFallback/>}>
-            <TwseDailyTable date={day} />
+            <TwseDailyTable dates={days} setIsLoading={ setIsLoading }/>
           </Suspense>
         }
 
