@@ -1,2 +1,1 @@
-# React + TypeScript + Vite
-Fetch twse data for analyze
+# Fetch twse data for analyze
